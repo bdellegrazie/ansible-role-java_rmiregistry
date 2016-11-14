@@ -1,0 +1,22 @@
+{{ ansible_managed | comment }}
+
+description "Java RMI Registry Daemon"
+author "Brett Delle Grazie <brett.dellegrazie@gmail.com>"
+start on (local-filesystems and net-device-up IFACE!=lo)
+stop on runlevel [016]
+
+setuid {{ java_rmiregistry_service_user }}
+setgid {{ java_rmiregistry_service_group }}
+umask  {{ java_rmiregistry_service_umask }}
+
+# System Defaults
+env PORT={{ java_rmiregistry_default_port }}
+env JVM_OPTS={{ java_rmiregistry_default_jvmopts }}
+env BINARY={{ java_rmiregistry_default_binary }}
+
+script
+  if [ -f /etc/default/rmiregistry ]; then
+    . /etc/default/rmiregistry
+  fi
+  exec $BINARY -J-Djava.security.egd=file:/dev/./urandom $JVM_OPTS $PORT
+end script

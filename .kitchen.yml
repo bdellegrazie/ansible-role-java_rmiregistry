@@ -1,0 +1,64 @@
+---
+driver:
+  name: docker
+  use_sudo: false
+
+provisioner:
+  name: ansible_playbook
+  hosts: test-kitchen
+  require_chef_for_busser: false
+  require_ruby_for_busser: false
+  requirements_path: test/integration/requirements.yml
+  ansible_verbose: false
+  ansible_verbosity: :warn
+  ansible_version: latest
+  ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
+  group_vars_path: test/integration/group_vars
+  ignore_paths_from_root:
+    - .bundle
+    - tests
+    - vendor
+  idempotency_test: true
+
+platforms:
+  - name: centos-6
+    driver_config:
+      platform: centos
+      image: geerlingguy/docker-centos6-ansible
+      cap_add:
+      - SYS_PTRACE
+  - name: centos-7
+    driver_config:
+      platform: centos
+      image: geerlingguy/docker-centos7-ansible
+  - name: debian-8
+    driver_config:
+      platform: debian
+      image: geerlingguy/docker-centos7-ansible
+  - name: ubuntu-12.04
+    driver_config:
+      platform: ubuntu
+      image: geerlingguy/docker-ubuntu1204-ansible
+  - name: ubuntu-14.04
+    driver_config:
+      platform: ubuntu
+      image: geerlingguy/docker-ubuntu1404-ansible
+  - name: ubuntu-16.04
+    driver_config:
+      platform: ubuntu
+      image: geerlingguy/docker-ubuntu1604-ansible
+  - name: fedora-24
+    driver_config:
+      platform: rhel
+      image: geerlingguy/docker-fedora24-ansible
+
+suites:
+  - name: default
+    verifier:
+      default_path: test/integration/default/serverspec
+
+verifier:
+  name: serverspec
+  remote_exec: false
+  patterns:
+    - '**/*_spec.rb'

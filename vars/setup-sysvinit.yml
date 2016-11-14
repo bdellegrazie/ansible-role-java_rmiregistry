@@ -1,0 +1,7 @@
+---
+java_rmiregistry_tools:
+  - daemonize
+
+java_rmiregistry_service_mgr: sysvinit
+java_rmiregistry_service_path: /etc/init.d/rmiregistry
+java_rmiregistry_service_mode: '0755'

@@ -1,0 +1,112 @@
+#! /bin/bash
+#
+# rmiregistry      Start/Stop the Java RMI Registry daemon
+#
+# chkconfig: - 80 20
+# description: rmiregistry is a central class registry for Remote Method Invocation.
+# processname: rmiregistry
+
+### BEGIN INIT INFO
+# Provides: rmiregistry
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Short-Description: Start/Stop the rmiregistry
+# Description: rmiregistry is a central class registry for Remote Method Invocation
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+# defaults
+BINARY={{ java_rmiregistry_default_binary }}
+PORT={{ java_rmiregistry_default_port }}
+JVM_OPTS={{ java_rmiregistry_default_jvmopts }}
+USER={{ java_rmiregistry_service_user }}
+
+# Source our configuration file for these variables.
+if [ -f /etc/default/rmiregistry ] ; then
+	. /etc/default/rmiregistry
+fi
+
+RETVAL=0
+
+# Set up some common variables before we launch into what might be
+# considered boilerplate by now.
+prog=$(basename ${BINARY})
+lockfile=/var/lock/subsys/$prog
+pidfile=/var/run/$prog.pid
+binary=$(readlink -f $BINARY)
+
+start() {
+	[ -r $path ] || exit 5
+	echo -n $"Starting $prog: "
+	# rmiregistry produces no output, so log is default of /dev/null
+	daemonize -c '/' -p $pidfile -l $lockfile -u $USER \
+		$binary -J-Djava.security.egd=file:/dev/./urandom $JVM_OPTS $PORT
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killproc -p $pidfile -b $binary $prog
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+	restart
+}
+
+force_reload() {
+	restart
+}
+
+rh_status() {
+	# run checks to determine if the service is running or use generic status
+	status -p $pidfile -l $lockfile -b $binary $prog
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+  start)
+	rh_status_q && exit 0
+	start
+	;;
+  stop)
+	rh_status_q || exit 0
+	stop
+	;;
+  restart)
+	restart
+	;;
+  reload)
+	rh_status_q || exit 7
+	reload
+	;;
+  force-reload)
+	force_reload
+	;;
+  status)
+	rh_status
+	;;
+  condrestart|try-restart)
+	rh_status_q || exit 0
+	restart
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+	exit 2
+esac
+
+exit $?

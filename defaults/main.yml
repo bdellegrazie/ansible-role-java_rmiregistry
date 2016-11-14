@@ -1,0 +1,18 @@
+---
+java_rmiregistry_default_port: 1099
+java_rmiregistry_default_binary: /usr/bin/rmiregistry
+java_rmiregistry_default_jvmopts: "-J-Djava.net.preferIPv4Stack=true"
+
+java_rmiregistry_service_user: nobody
+java_rmiregistry_service_group: nogroup
+java_rmiregistry_service_umask: '0022'
+
+java_rmiregistry_service_enable: true
+java_rmiregistry_service_state: started
+java_rmiregistry_service_manage: true
+java_rmiregistry_service_notify: true
+
+java_rmiregistry_tools: []
+
+java_rmiregistry_service_mgr: "{{ ansible_service_mgr }}"
+java_rmiregistry_service_template: rmiregistry.{{ java_rmiregistry_service_mgr }}.j2

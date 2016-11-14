@@ -1,0 +1,6 @@
+---
+java_rmiregistry_tools: []
+
+java_rmiregistry_service_mgr: upstart
+java_rmiregistry_service_path: /etc/init/rmiregistry.conf
+java_rmiregistry_service_mode: '0644'

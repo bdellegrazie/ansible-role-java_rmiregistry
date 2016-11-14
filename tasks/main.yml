@@ -1,0 +1,53 @@
+---
+- name: Override service manager based on OS
+  include_vars: "{{ item }}"
+  with_first_found:
+  - files:
+      - "setup-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+      - "setup-family-{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version }}.yml"
+    skip: true
+
+- name: Service Manager Specific Variables
+  include_vars: "{{ item }}"
+  with_first_found:
+  - files:
+    - "setup-{{ java_rmiregistry_service_mgr_os }}.yml"
+    - "setup-{{ ansible_service_mgr }}.yml"
+    - setup-systemd.yml
+
+- name: Install Tools
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ java_rmiregistry_tools }}"
+
+- name: Startup Defaults
+  template:
+    dest: /etc/default/rmiregistry
+    group: root
+    mode: '0644'
+    owner: root
+    src: rmiregistry.default.j2
+  notify:
+  - systemd daemon reload
+  - restart rmiregistry
+
+- name: Startup Script
+  template:
+    dest: "{{ java_rmiregistry_service_path }}"
+    group: root
+    mode: "{{ java_rmiregistry_service_mode }}"
+    owner: root
+    src: "{{ java_rmiregistry_service_template }}"
+  notify:
+  - systemd daemon reload
+  - restart rmiregistry
+
+- name: Manage Service
+  service:
+    name: rmiregistry
+    enabled: "{{ java_rmiregistry_service_enable }}"
+  when: java_rmiregistry_service_manage
+  notify:
+  - systemd daemon reload
+  - restart rmiregistry

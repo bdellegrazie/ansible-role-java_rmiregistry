@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+
+{% if java_rmiregistry_port is defined %}
+PORT={{ java_rmiregistry_port }}
+{% endif %}
+{% if java_rmiregistry_binary is defined %}
+BINARY={{ java_rmiregistry_bin }}
+{% endif %}
+{% if java_rmiregistry_jvmopts is defined %}
+JVM_OPTS={{ java_rmiregistry_jvmopts }}
+{% endif %}

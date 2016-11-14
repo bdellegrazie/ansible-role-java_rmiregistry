@@ -1,0 +1,6 @@
+---
+java_rmiregistry_tools: []
+
+java_rmiregistry_service_mgr: systemd
+java_rmiregistry_service_path: /etc/systemd/system/rmiregistry.service
+java_rmiregistry_service_mode: '0644'
