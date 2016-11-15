@@ -7,9 +7,10 @@
     -   id: check-case-conflict
     -   id: check-json
     -   id: end-of-file-fixer
-- repo: https://github.com/willthames/ansible-lint.git
-  sha: v3.4.3
-  hooks:
-    - id: ansible-lint
-      files: \.(yaml|yml)$
-      args: [--exclude=.travis.yml]
+-   repo: https://github.com/willthames/ansible-lint.git
+    sha: 959ab0f525e9abb19cf75f34381015cf33695f61
+    hooks:
+    -   id: ansible-lint
+        files: \.(yaml|yml)$
+        args:
+        - --exclude=.travis.yml
