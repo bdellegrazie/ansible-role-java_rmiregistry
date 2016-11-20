@@ -8,10 +8,10 @@ GEM
       test-kitchen (~> 1.4)
     kitchen-docker (2.6.0)
       test-kitchen (>= 1.0.0)
-    kitchen-verifier-serverspec (0.6.0)
+    kitchen-verifier-serverspec (0.6.2)
       net-ssh (~> 3)
       test-kitchen (~> 1.4)
-    mixlib-install (2.1.6)
+    mixlib-install (2.1.7)
       artifactory
       mixlib-shellout
       mixlib-versioning
@@ -53,7 +53,7 @@ GEM
       net-ssh (>= 2.7, < 4.0)
       net-telnet
       sfl
-    test-kitchen (1.13.2)
+    test-kitchen (1.14.0)
       mixlib-install (>= 1.2, < 3.0)
       mixlib-shellout (>= 1.2, < 3.0)
       net-scp (~> 1.1)

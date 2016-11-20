@@ -8,11 +8,10 @@ Type=simple
 User={{ java_rmiregistry_service_user }}
 Group={{ java_rmiregistry_service_group }}
 WorkingDirectory=/
-Environment="BINARY={{ java_rmiregistry_default_binary }}"
 Environment="JVM_OPTS={{ java_rmiregistry_default_jvmopts }}"
 Environment="PORT={{ java_rmiregistry_default_port }}"
 EnvironmentFile=-/etc/default/rmiregistry
-ExecStart=$BINARY -J-Djava.security.egd=file:/dev/./urandom $JVM_OPTS $PORT
+ExecStart={{ java_rmiregistry_binary | default(java_rmiregistry_default_binary) }} -J-Djava.security.egd=file:/dev/./urandom $JVM_OPTS $PORT
 TimeoutSec=15
 Restart=on-failure
 

@@ -1,0 +1,62 @@
+FROM centos:7
+MAINTAINER "Brett Delle Grazie" <brett.dellegrazie@gmail.com>
+ENV container docker
+
+# Custom mirror
+RUN echo "proxy=http://172.17.0.1:8000" >> /etc/yum.conf && \
+sed -e 's!^\(enabled=\)1.*$!\10!' -i /etc/yum/pluginconf.d/fastestmirror.conf && \
+sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)mirror.centos.org/centos\(.*\)$!\1www.mirrorservice.org/sites/mirror.centos.org\2!' -i /etc/yum.repos.d/*.repo && \
+yum -y install epel-release && \
+sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)download.fedoraproject.org\(.*\)$!\1www.mirrorservice.org/sites/dl.fedoraproject.org\2!' -i /etc/yum.repos.d/epel*.repo
+
+# Enable systemd -- See https://hub.docker.com/_/centos/
+RUN yum -y update ; yum clean all ; \
+(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+VOLUME ["/sys/fs/cgroup"]
+
+RUN yum makecache fast
+
+# Setup SSH daemon so test-kitchen can access the container
+RUN yum -y install sudo openssh-server openssh-clients which curl && \
+  ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N '' && \
+  ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' && \
+  echo 'OPTIONS="-o UseDNS=no -o UsePAM=no -o PasswordAuthentication=yes"' >> /etc/sysconfig/sshd && \
+  systemctl enable sshd.service
+
+# Install Ansible and other requirements.
+RUN yum -y install deltarpm epel-release iproute \
+ && yum -y update \
+ && yum -y install \
+      ansible \
+      sudo \
+      which \
+ && yum clean all
+
+RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/' /etc/sudoers
+
+# Install Ansible inventory file.
+RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
+
+<% homedir=@username == 'root' ? '/root' : "/home/" + @username %>
+
+RUN if ! getent passwd kitchen; then \
+    useradd -d <%= homedir %> -m -s /bin/bash -p '*' <%= @username %>; \
+fi
+
+RUN echo "<%= @username %> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+mkdir -p <%= homedir %>/.ssh && \
+chown -R <%= @username %>:<%= @username %> <%= homedir %>/.ssh && \
+chmod 0700 <%= homedir %>/.ssh && \
+touch <%= homedir %>/.ssh/authorized_keys && \
+chown <%= @username %>:<%= @username %> <%= homedir %>/.ssh/authorized_keys && \
+chmod 0600 <%= homedir %>/.ssh/authorized_keys && \
+echo <%= Shellwords.escape(IO.read(@public_key).strip) %> >> <%= homedir %>/.ssh/authorized_keys
+
+EXPOSE 22

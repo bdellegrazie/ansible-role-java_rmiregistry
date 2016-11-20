@@ -31,6 +31,11 @@ platforms:
     driver_config:
       platform: centos
       image: geerlingguy/docker-centos7-ansible
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      dockerfile: docker/centos-7.docker.erb
+      run_command: /usr/sbin/init
   - name: debian-8
     driver_config:
       platform: debian
