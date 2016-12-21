@@ -4,7 +4,7 @@ java_rmiregistry_default_binary: /usr/bin/rmiregistry
 java_rmiregistry_default_jvmopts: "-J-Djava.net.preferIPv4Stack=true"
 
 java_rmiregistry_service_user: nobody
-java_rmiregistry_service_group: nogroup
+java_rmiregistry_service_group: nobody
 java_rmiregistry_service_umask: '0022'
 
 java_rmiregistry_service_enable: true
