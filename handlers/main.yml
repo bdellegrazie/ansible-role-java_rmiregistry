@@ -2,7 +2,7 @@
 
 - name: systemd daemon reload
   become: yes
-  command: /usr/bin/systemctl daemon-reload
+  command: /bin/systemctl daemon-reload
   when: java_rmiregistry_service_mgr == 'systemd'
 
 - name: restart rmiregistry
