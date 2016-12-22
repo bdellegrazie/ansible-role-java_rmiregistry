@@ -1,6 +1,7 @@
 ---
 driver:
   name: docker
+  require_chef_omnibus: false
   use_sudo: false
 
 provisioner:
@@ -22,40 +23,61 @@ provisioner:
 
 platforms:
   - name: centos-6
+    driver_plugin: docker
     driver_config:
       platform: centos
-      image: geerlingguy/docker-centos6-ansible
-      cap_add:
-      - SYS_PTRACE
+      privileged: true
+      dockerfile: docker/centos-6.docker.erb
+      run_command: /sbin/init
   - name: centos-7
+    driver_plugin: docker
     driver_config:
       platform: centos
-      image: geerlingguy/docker-centos7-ansible
       privileged: true
       volume:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       dockerfile: docker/centos-7.docker.erb
-      run_command: /usr/sbin/init
+      run_command: /sbin/init
   - name: debian-8
     driver_config:
       platform: debian
-      image: geerlingguy/docker-centos7-ansible
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      dockerfile: docker/debian-8.docker.erb
+      run_command: /sbin/init
   - name: ubuntu-12.04
     driver_config:
       platform: ubuntu
-      image: geerlingguy/docker-ubuntu1204-ansible
+      dockerfile: docker/ubuntu-1204.docker.erb
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      run_command: /sbin/init
   - name: ubuntu-14.04
     driver_config:
       platform: ubuntu
-      image: geerlingguy/docker-ubuntu1404-ansible
+      dockerfile: docker/ubuntu-1404.docker.erb
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      run_command: /sbin/init
   - name: ubuntu-16.04
     driver_config:
       platform: ubuntu
-      image: geerlingguy/docker-ubuntu1604-ansible
+      dockerfile: docker/ubuntu-1604.docker.erb
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      run_command: /sbin/init
   - name: fedora-24
     driver_config:
       platform: rhel
-      image: geerlingguy/docker-fedora24-ansible
+      dockerfile: docker/fedora-24.docker.erb
+      privileged: true
+      volume:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      run_command: /sbin/init
 
 suites:
   - name: default

@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:6
 MAINTAINER "Brett Delle Grazie" <brett.dellegrazie@gmail.com>
 ENV container docker
 
@@ -8,31 +8,18 @@ sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)mirror.centos.org/cento
 yum -y install epel-release && \
 sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)download.fedoraproject.org\(.*\)$!\1www.mirrorservice.org/sites/dl.fedoraproject.org\2!' -i /etc/yum.repos.d/epel*.repo
 
-# Enable systemd -- See https://hub.docker.com/_/centos/
-RUN yum -y update ; yum clean all ; \
-(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
-rm -f /lib/systemd/system/multi-user.target.wants/*;\
-rm -f /etc/systemd/system/*.wants/*;\
-rm -f /lib/systemd/system/local-fs.target.wants/*; \
-rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-rm -f /lib/systemd/system/basic.target.wants/*;\
-rm -f /lib/systemd/system/anaconda.target.wants/*;
-VOLUME ["/sys/fs/cgroup"]
-
-RUN yum makecache fast
-
 # Setup SSH daemon so test-kitchen can access the container
-RUN yum -y install sudo openssh-server openssh-clients which curl && \
+RUN yum -y install upstart sudo openssh-server openssh-clients which curl && \
   ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N '' && \
   ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' && \
   echo 'OPTIONS="-o UseDNS=no -o UsePAM=no -o PasswordAuthentication=yes"' >> /etc/sysconfig/sshd && \
-  systemctl enable sshd.service
+  chkconfig sshd on
 
 EXPOSE 22
 
 # Install Ansible and other requirements.
-RUN yum -y install deltarpm \
+RUN yum makecache fast \
+ && yum -y install deltarpm \
  && yum -y update \
  && yum -y install \
       ansible \
@@ -42,7 +29,7 @@ RUN yum -y install deltarpm \
  && yum clean all
 
 # Disable requiretty.
-RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/' /etc/sudoers
+RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 # Install Ansible inventory file.
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
