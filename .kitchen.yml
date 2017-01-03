@@ -1,8 +1,9 @@
 ---
 driver:
-  name: docker
-  require_chef_omnibus: false
-  use_sudo: false
+  name: docker_cli
+
+transport:
+  name: docker_cli
 
 provisioner:
   name: ansible_playbook
@@ -17,67 +18,67 @@ provisioner:
   group_vars_path: test/integration/group_vars
   ignore_paths_from_root:
     - .bundle
+    - .kitchen
+    - .git
     - tests
     - vendor
   idempotency_test: true
 
 platforms:
   - name: centos-6
-    driver_plugin: docker
     driver_config:
       platform: centos
-      privileged: true
       dockerfile: docker/centos-6.docker.erb
-      run_command: /sbin/init
+      privileged: true
+      command: /sbin/init
   - name: centos-7
-    driver_plugin: docker
     driver_config:
       platform: centos
+      dockerfile: docker/centos-7.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      dockerfile: docker/centos-7.docker.erb
-      run_command: /sbin/init
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
   - name: debian-8
     driver_config:
       platform: debian
+      dockerfile: docker/debian-8.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      dockerfile: docker/debian-8.docker.erb
-      run_command: /sbin/init
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
   - name: ubuntu-12.04
     driver_config:
       platform: ubuntu
       dockerfile: docker/ubuntu-1204.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      run_command: /sbin/init
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
   - name: ubuntu-14.04
     driver_config:
       platform: ubuntu
       dockerfile: docker/ubuntu-1404.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      run_command: /sbin/init
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
   - name: ubuntu-16.04
     driver_config:
       platform: ubuntu
       dockerfile: docker/ubuntu-1604.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      run_command: /sbin/init
-  - name: fedora-24
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
+  - name: fedora-25
     driver_config:
       platform: rhel
-      dockerfile: docker/fedora-24.docker.erb
+      dockerfile: docker/fedora-25.docker.erb
       privileged: true
       volume:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      run_command: /sbin/init
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      command: /sbin/init
 
 suites:
   - name: default

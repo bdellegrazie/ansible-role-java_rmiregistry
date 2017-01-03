@@ -8,15 +8,6 @@ sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)mirror.centos.org/cento
 yum -y install epel-release && \
 sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)download.fedoraproject.org\(.*\)$!\1www.mirrorservice.org/sites/dl.fedoraproject.org\2!' -i /etc/yum.repos.d/epel*.repo
 
-# Setup SSH daemon so test-kitchen can access the container
-RUN yum -y install upstart sudo openssh-server openssh-clients which curl && \
-  ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N '' && \
-  ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' && \
-  echo 'OPTIONS="-o UseDNS=no -o UsePAM=no -o PasswordAuthentication=yes"' >> /etc/sysconfig/sshd && \
-  chkconfig sshd on
-
-EXPOSE 22
-
 # Install Ansible and other requirements.
 RUN yum makecache fast \
  && yum -y install deltarpm \
@@ -33,18 +24,3 @@ RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 # Install Ansible inventory file.
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
-
-<% homedir=@username == 'root' ? '/root' : "/home/" + @username %>
-
-RUN if ! getent passwd kitchen; then \
-    useradd -d <%= homedir %> -m -s /bin/bash -p '*' <%= @username %>; \
-fi
-
-RUN echo "<%= @username %> ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-mkdir -p <%= homedir %>/.ssh && \
-chown -R <%= @username %>:<%= @username %> <%= homedir %>/.ssh && \
-chmod 0700 <%= homedir %>/.ssh && \
-touch <%= homedir %>/.ssh/authorized_keys && \
-chown <%= @username %>:<%= @username %> <%= homedir %>/.ssh/authorized_keys && \
-chmod 0600 <%= homedir %>/.ssh/authorized_keys && \
-echo <%= Shellwords.escape(IO.read(@public_key).strip) %> >> <%= homedir %>/.ssh/authorized_keys
