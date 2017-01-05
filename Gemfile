@@ -7,4 +7,5 @@ group :test do
   gem 'kitchen-verifier-serverspec'
   gem 'docker-api'
   gem 'serverspec'
+  gem 'travis'
 end

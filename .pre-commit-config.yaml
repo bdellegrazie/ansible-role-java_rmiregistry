@@ -14,3 +14,16 @@
         files: \.(yaml|yml)$
         args:
         - --exclude=.travis.yml
+-   repo: local
+    hooks:
+    -   id: travis-lint
+        name: travis lint
+        entry: ./vendor/bin/travis
+        language: script
+        files: ^\.travis\.yml$
+        args:
+        - lint
+        - --no-interactive
+        - --skip-version-check
+        - --skip-completion-check
+        - --exit-code
