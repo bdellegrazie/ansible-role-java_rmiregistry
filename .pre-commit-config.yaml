@@ -17,11 +17,13 @@
 -   repo: local
     hooks:
     -   id: travis-lint
-        name: travis lint
-        entry: ./vendor/bin/travis
-        language: script
+        name: Travis Lint
+        entry: bundle
+        language: system
         files: ^\.travis\.yml$
         args:
+        - exec
+        - travis
         - lint
         - --no-interactive
         - --skip-version-check
