@@ -2,11 +2,7 @@ FROM centos:6
 MAINTAINER "Brett Delle Grazie" <brett.dellegrazie@gmail.com>
 ENV container docker
 
-# Custom mirror
-RUN sed -e 's!^\(enabled=\)1.*$!\10!' -i /etc/yum/pluginconf.d/fastestmirror.conf && \
-sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)mirror.centos.org/centos\(.*\)$!\1www.mirrorservice.org/sites/mirror.centos.org\2!' -i /etc/yum.repos.d/*.repo && \
-yum -y install epel-release && \
-sed -e 's/^mirrorlist.*$/#&/' -e 's!^#\(baseurl=http://\)download.fedoraproject.org\(.*\)$!\1www.mirrorservice.org/sites/dl.fedoraproject.org\2!' -i /etc/yum.repos.d/epel*.repo
+RUN yum -y install epel-release
 
 # Install Ansible and other requirements.
 RUN yum makecache fast \

@@ -1,37 +1,31 @@
 ---
+dist: trusty
 sudo: required
 
+language:
+  - ruby
+
 env:
-  - distro: centos7
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: centos6
-    init: /sbin/init
-    run_opts: ""
-  - distro: fedora24
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: ubuntu1604
-    init: /lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: ubuntu1404
-    init: /sbin/init
-    run_opts: ""
-  - distro: ubuntu1204
-    init: /sbin/init
-    run_opts: ""
+  matrix:
+    - distro=centos6 init=/sbin/init dockerfile=docker/centos-6.docker.erb run_opts=""
 
 services:
   - docker
 
 before_install:
-  # Pull container.
-  - 'sudo docker pull geerlingguy/docker-${distro}-ansible:latest'
+  - pip install pre-commit
+  - 'sudo docker build -f ${dockerfile} -t bdellegrazie/docker-${distro}-ansible:latest .'
+
+install:
+  - pre-commit install
+  - bundle install --without=development --binstubs=vendor/bin --path=vendor/bundle
 
 script:
+  - pre-commit run --all-files
   - container_id=$(mktemp)
+
   # Run container in detached state.
-  - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+  - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} bdellegrazie/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
   # Ansible syntax check.
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml --syntax-check'
@@ -48,8 +42,8 @@ script:
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
 
-  # Ensure Java is installed.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm which java'
+  # Execute tests
+  - 'export KITCHEN_CONTAINER_ID=$(cat ${container_id}) ; vendor/bin/rspec -I test/integration/default/serverspec -P "test/integration/default/**/*_spec.rb"'
 
 after_success:
   # Clean up.
