@@ -16,6 +16,8 @@ provisioner:
   ansible_version: latest
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
   group_vars_path: test/integration/group_vars
+  env_vars:
+    ANSIBLE_FORCE_COLOR: 1
   ignore_paths_from_root:
     - .bundle
     - .kitchen
@@ -23,62 +25,54 @@ provisioner:
     - tests
     - vendor
   idempotency_test: true
+  max_retries: 2
 
 platforms:
   - name: centos-6
     driver_config:
       platform: centos
-      dockerfile: docker/centos-6.docker.erb
+      image: geerlingguy/docker-centos6-ansible:latest
       privileged: true
       command: /sbin/init
   - name: centos-7
     driver_config:
       platform: centos
-      dockerfile: docker/centos-7.docker.erb
+      image: geerlingguy/docker-centos7-ansible:latest
       privileged: true
       volume:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
+      command: /usr/lib/systemd/systemd
   - name: debian-8
     driver_config:
       platform: debian
-      dockerfile: docker/debian-8.docker.erb
+      image: bdellegrazie/docker-debian8-ansible:latest
       privileged: true
       volume:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
-  - name: ubuntu-12.04
-    driver_config:
-      platform: ubuntu
-      dockerfile: docker/ubuntu-1204.docker.erb
-      privileged: true
-      volume:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
-  - name: ubuntu-14.04
-    driver_config:
-      platform: ubuntu
-      dockerfile: docker/ubuntu-1404.docker.erb
-      privileged: true
-      volume:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
+      command: /lib/systemd/systemd
   - name: ubuntu-16.04
     driver_config:
       platform: ubuntu
-      dockerfile: docker/ubuntu-1604.docker.erb
+      image: bdellegrazie/docker-ubuntu1604-ansible:latest
       privileged: true
       volume:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
+      command: /lib/systemd/systemd
+      stop_signal: RTMIN+3
+      #cap_add:
+      #  - SYS_ADMIN
+      #security_opt: seccomp=unconfined
+      tmpfs:
+        - /run
+        - /run/lock
   - name: fedora-25
     driver_config:
       platform: rhel
-      dockerfile: docker/fedora-25.docker.erb
+      image: bdellegrazie/docker-fedora25-ansible:latest
       privileged: true
       volume:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      command: /sbin/init
+      command: /usr/lib/systemd/systemd
 
 suites:
   - name: default

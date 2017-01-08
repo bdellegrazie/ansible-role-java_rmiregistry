@@ -1,3 +1,3 @@
 ---
 # For RHEL 6, we use sysvinit instead of upstart as the version of upstart in RHEL 6 is extremely old and missing several features we use (setuid)
-java_rmiregistry_service_mgr_os: sysvinit
+java_rmiregistry_service_mgr: sysvinit

@@ -2,12 +2,14 @@
 
 - name: systemd daemon reload
   become: yes
-  command: /bin/systemctl daemon-reload
+  command: systemctl daemon-reload
   when: java_rmiregistry_service_mgr == 'systemd'
 
 - name: restart rmiregistry
   become: yes
+  become_user: root
   service:
     name: rmiregistry
     state: "{{ (java_rmiregistry_service_state != 'stopped') | ternary('restarted','stopped') }}"
+    use: "{{ java_rmiregistry_service_mgr }}"
   when: java_rmiregistry_service_notify

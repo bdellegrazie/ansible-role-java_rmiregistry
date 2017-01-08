@@ -12,7 +12,7 @@
   include_vars: "{{ item }}"
   with_first_found:
   - files:
-    - "setup-{{ java_rmiregistry_service_mgr_os }}.yml"
+    - "setup-{{ java_rmiregistry_service_mgr }}.yml"
     - "setup-{{ ansible_service_mgr }}.yml"
     - setup-systemd.yml
 
@@ -55,4 +55,5 @@
   service:
     name: rmiregistry
     enabled: "{{ java_rmiregistry_service_enable }}"
+    use: "{{ java_rmiregistry_service_mgr }}"
   when: java_rmiregistry_service_manage
