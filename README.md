@@ -1,22 +1,23 @@
-Role Name
-=========
+java_rmiregistry
+================
 
-A brief description of the role goes here.
+This role manages Java's RMI Registry server as a system service on Debian / RedHat family OS.
 
-Requirements
-------------
+Normally the first Java process active on a system is the one to provide the RMI service for all other Java processes. If that first process is restarted then the
+RMI server "disappears" to any of the other Java processes on the machine which can cause them to crash or fail abnormally.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Running a separate RMI Server can alleviate this issue. Note that Java EE servers, such as Tomcat and similar normally run their own RMI Server so are not subject to this issue.
+
+[![Build Status](https://travis-ci.org/bdellegrazie/ansible-role-java_rmiregistry.svg?branch=master)](https://travis-ci.org/bdellegrazie/ansible-role-java_rmiregistry)
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+    java_rmiregistry_default_port: 1099
+    java_rmiregistry_default_binary: /usr/bin/rmiregistry
+    java_rmiregistry_default_jvmopts: "-J-Djava.net.preferIPv4Stack=true"
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+See defaults/main.yml for the full list
 
 Example Playbook
 ----------------
@@ -25,14 +26,14 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - { bdellegrazie.java_rmiregistry }
 
 License
 -------
 
-BSD
+GPLv3
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+https://github.com/bdellegrazie/ansible-role-java_rmiregistry
