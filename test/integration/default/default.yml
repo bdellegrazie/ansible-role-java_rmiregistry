@@ -1,6 +1,0 @@
----
-- hosts: all
-  roles:
-  - bdellegrazie.ansible-role-serverspec_test_dependencies
-  - geerlingguy.java
-  - ansible-role-java_rmiregistry
