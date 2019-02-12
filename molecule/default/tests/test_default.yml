@@ -1,0 +1,13 @@
+---
+port:
+  tcp:1099:
+    listening: true
+
+process:
+  rmiregistry:
+    running: true
+
+service:
+  rmiregistry:
+    enabled: true
+    running: true
