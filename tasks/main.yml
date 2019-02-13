@@ -2,29 +2,29 @@
 - name: Override service manager based on OS
   include_vars: "{{ item }}"
   with_first_found:
-  - files:
-      - "setup-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
-      - "setup-family-{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version }}.yml"
-      - "setup-family-{{ ansible_os_family | lower }}.yml"
-    skip: true
+    - files:
+        - "setup-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "setup-family-{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "setup-family-{{ ansible_os_family | lower }}.yml"
+      skip: true
 
 - name: Service Manager Specific Variables
   include_vars: "{{ item }}"
   with_first_found:
-  - files:
-    - "setup-{{ java_rmiregistry_service_mgr }}.yml"
-    - "setup-{{ ansible_service_mgr }}.yml"
-    - setup-systemd.yml
+    - files:
+        - "setup-{{ java_rmiregistry_service_mgr }}.yml"
+        - "setup-{{ ansible_service_mgr }}.yml"
+        - setup-systemd.yml
 
 - name: Install Tools
-  become: yes
+  become: true
   package:
     name: "{{ item }}"
     state: present
   with_items: "{{ java_rmiregistry_tools }}"
 
 - name: Startup Defaults
-  become: yes
+  become: true
   template:
     dest: /etc/default/rmiregistry
     group: root
@@ -32,11 +32,11 @@
     owner: root
     src: rmiregistry.default.j2
   notify:
-  - systemd daemon reload
-  - restart rmiregistry
+    - systemd daemon reload
+    - restart rmiregistry
 
 - name: Startup Script
-  become: yes
+  become: true
   template:
     dest: "{{ java_rmiregistry_service_path }}"
     group: root
@@ -44,14 +44,14 @@
     owner: root
     src: "{{ java_rmiregistry_service_template }}"
   notify:
-  - systemd daemon reload
-  - restart rmiregistry
+    - systemd daemon reload
+    - restart rmiregistry
 
 # Required for correct handling of systemd
 - meta: flush_handlers
 
 - name: Manage Service
-  become: yes
+  become: true
   service:
     name: rmiregistry
     enabled: "{{ java_rmiregistry_service_enable }}"

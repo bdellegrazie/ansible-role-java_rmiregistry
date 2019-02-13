@@ -1,12 +1,13 @@
 ---
 
 - name: systemd daemon reload
-  become: yes
-  command: systemctl daemon-reload
+  become: true
+  systemd:
+    daemon_reload: true
   when: java_rmiregistry_service_mgr == 'systemd'
 
 - name: restart rmiregistry
-  become: yes
+  become: true
   become_user: root
   service:
     name: rmiregistry
