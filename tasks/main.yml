@@ -1,20 +1,29 @@
 ---
 - name: Override service manager based on OS
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
+  include_vars: "{{ lookup('first_found', params) }}"
+  ignore_errors: true
+  vars:
+    params:
+      files:
         - "setup-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
         - "setup-family-{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version }}.yml"
         - "setup-family-{{ ansible_os_family | lower }}.yml"
+      paths:
+        - "vars"
       skip: true
 
 - name: Service Manager Specific Variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
+  include_vars: "{{ lookup('first_found', params) }}"
+  ignore_errors: true
+  vars:
+    params:
+      files:
         - "setup-{{ java_rmiregistry_service_mgr }}.yml"
         - "setup-{{ ansible_service_mgr }}.yml"
-        - setup-systemd.yml
+        - "setup-systemd.yml"
+      paths:
+        - "vars"
+      skip: true
 
 - name: Install Tools
   become: true
