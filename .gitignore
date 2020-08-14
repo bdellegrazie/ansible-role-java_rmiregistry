@@ -10,6 +10,7 @@ build
 .checkstyle
 .project
 .pydevproject
+.direnv/
 .settings/
 .venv/
 
@@ -23,11 +24,3 @@ build
 # Ansible stuff...
 *.retry
 ansible.cfg
-
-# Test kitchen
-.kitchen/
-.kitchen.local.yml
-
-# Ruby
-.bundle/
-vendor/
